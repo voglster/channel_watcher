@@ -1,4 +1,5 @@
 import os
+from zoneinfo import ZoneInfo
 import googleapiclient.discovery
 import googleapiclient.errors
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -13,7 +14,9 @@ load_dotenv()
 # Retrieve environment variables
 API_KEY = os.getenv("YOUTUBE_API_KEY")
 CHANNEL_ID = os.getenv("YOUTUBE_CHANNEL_ID")
+CHANNEL_NAME = os.getenv("CHANNEL_NAME") or CHANNEL_ID
 CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", 3))  # Default to 3 hours
+MAX_AGE = int(os.getenv("MAX_AGE", 7))  # Default to 3 hours
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 
 import googleapiclient.discovery
@@ -59,21 +62,21 @@ def get_time_difference(last_video_datetime, current_time):
     return int(hours), int(minutes), int(seconds)
 
 def check_last_video_time():
-    current_time = datetime.datetime.now()
+    current_time = datetime.datetime.now(ZoneInfo("UTC"))  # Ensure current_time is timezone-aware (in UTC)
     last_video_time = get_last_video_upload_time(API_KEY, CHANNEL_ID)
 
     if last_video_time:
-        last_video_datetime = datetime.datetime.fromisoformat(last_video_time.replace("Z", "+00:00"))
-        hours, minutes, seconds = get_time_difference(last_video_datetime, current_time)
+        last_video_datetime = datetime.datetime.fromisoformat(last_video_time.replace("Z", "+00:00")).replace(tzinfo=ZoneInfo("UTC"))
+        time_difference = current_time - last_video_datetime
 
-        if hours >= 6:  # Check if more than 6 hours have passed
-            message = f"The last video is more than 6 hours old. Time since last video: {hours} hours, {minutes} minutes, {seconds} seconds."
+        if time_difference.total_seconds() > MAX_AGE * 3600:  # 6 hours in seconds
+            message = f"The last video is more than {MAX_AGE} hours old. Time since last video: {time_difference}"
             logger.error(message)
             post_to_slack(message)
         else:
-            message = f"The last video was uploaded on: {last_video_datetime}. Time since last video: {hours} hours, {minutes} minutes, {seconds} seconds."
+            message = f"The last video was uploaded on: {last_video_datetime}. Time since last video: {time_difference}"
             logger.info(message)
-            print(message)
+
 
 def post_to_slack(message):
     payload = {"text": message}
@@ -92,12 +95,16 @@ def main():
     scheduler.add_job(check_last_video_time, 'interval', hours=CHECK_INTERVAL)
 
     try:
-        logger.info(f"Scheduler started. Checking every {CHECK_INTERVAL} hours. Press Ctrl+C to exit.")
+        msg = f"Watching {CHANNEL_NAME}. Checking every {CHECK_INTERVAL} hours for last video over {MAX_AGE} hours ago."
+        logger.info(msg)
+        post_to_slack(msg)
         scheduler.start()
     except (KeyboardInterrupt, SystemExit):
         logger.info("Scheduler stopped.")
+        post_to_slack("Scheduler stopped.")
     except Exception as e:
         logger.exception(f"An error occurred: {e}")
+        post_to_slack(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
