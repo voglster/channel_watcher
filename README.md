@@ -1,3 +1,6 @@
+# Can be found on dockerhub
+`docker pull voglster/channel_watcher`
+
 # YouTube Video Checker with Slack Notifications
 
 This Python script checks the upload time of the latest video on a specified YouTube channel and sends a notification to a Slack channel if the last video was uploaded more than 6 hours ago.
