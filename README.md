@@ -32,7 +32,9 @@ Replace the placeholders with your actual API key, channel ID, and Slack webhook
 
 To run the script and schedule periodic checks, execute the following Docker command:
 
-`docker run -d youtube-video-checker`
+`docker run --rm --env-file .env youtube-video-checker`
+
+optionally throw in a -d to daemonize it
 
 The script will check the last video upload time every 3 hours by default. If the last video was uploaded more than 6 hours ago, it will send a notification to the specified Slack channel (if a webhook URL is provided).
 
