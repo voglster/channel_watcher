@@ -20,12 +20,14 @@ Before running this script, you need to set up the following:
 
 2. Create a `.env` file in the project directory with the following content:
 
-`YOUTUBE_API_KEY=\<Your YouTube API Key\>`
-`YOUTUBE_CHANNEL_ID=\<Your YouTube Channel ID\>`
-`CHANNEL_NAME=\<A Nice Name for Slack Logging\>`
-`SLACK_WEBHOOK_URL=\<Your Slack Webhook URL\>`
-`CHECK_INTERVAL=\<3\>`
-`MAX_AGE=\<7\>`
+```
+YOUTUBE_API_KEY=Your YouTube API Key
+YOUTUBE_CHANNEL_ID=Your YouTube Channel ID
+CHANNEL_NAME=A Nice Name for Slack Logging
+SLACK_WEBHOOK_URL=Your Slack Webhook URL
+CHECK_INTERVAL=3
+MAX_AGE=7
+```
 
 Replace the placeholders with your actual API key, channel ID, and Slack webhook URL.
 
