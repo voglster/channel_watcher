@@ -33,13 +33,13 @@ Replace the placeholders with your actual API key, channel ID, and Slack webhook
 
 3. Build the Docker image:
 
-`docker build -t youtube-video-checker .`
+`docker build -t channel_watcher .`
 
 ## Usage
 
 To run the script and schedule periodic checks, execute the following Docker command:
 
-`docker run --rm --env-file .env youtube-video-checker`
+`docker run --rm --env-file .env channel_watcher`
 
 Optionally, add `-d` to daemonize it.
 
