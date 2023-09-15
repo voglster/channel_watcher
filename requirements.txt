@@ -1,0 +1,5 @@
+google-api-python-client
+requests
+loguru
+python-dotenv
+APScheduler

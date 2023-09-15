@@ -1,0 +1,21 @@
+# .gitignore
+
+# Python-specific
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.log
+
+# Virtual environments
+venv/
+env/
+.env
+
+# IDE-specific
+.idea/
+
+# Jupyter Notebook-specific
+.ipynb_checkpoints/
+
